@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.kfx2026/sanyu-research",
   "title": "SanYu Research Engine",
-  "description": "100+ deterministic medical research engines: stats, survival, bioinformatics, primers.",
-  "version": "1.0.0",
+  "description": "106 deterministic medical research tools (not LLM guessing): ROC/AUC + DeLong, survival KM/Cox, Table 1, sample size, PSM, DEG, GO/KEGG enrichment, PPI, primer design, literature search. Every response carries engine_status (real / unavailable / error) and data_source so results are auditable. Failed calls are never charged. Three tools (act_sequence_translate, act_sequence_orf, act_roc) run without an API key for evaluation.",
+  "version": "1.1.0",
   "websiteUrl": "https://sanyu.wentangkeji.com",
   "repository": {
     "url": "https://github.com/kfx2026/sanyu-research-mcp",
