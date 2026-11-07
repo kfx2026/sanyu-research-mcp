@@ -1,9 +1,16 @@
 # SanYu Research Engine — MCP Server
 
-**Real-algorithm medical research engines. 100+ deterministic tools. No LLM guessing.**
+**Real-algorithm medical research engines. 106 deterministic tools. No LLM guessing.**
+
+> **调用需要自备密钥**：目录和工具列表免费查看，执行需在
+> [sanyu.wentangkeji.com/api-keys](https://sanyu.wentangkeji.com/api-keys) 免费领取一把 key，
+> 填进 `Authorization: Bearer sk-sanyu-xxx`（注册送试用积分，执行失败不扣分）。
+>
+> **只想先试试效果？** `act_sequence_translate`、`act_sequence_orf`、`act_roc`
+> 这三个工具**无需密钥**，每 IP 每天可试 20 次，返回体带 `demo:true` 与剩余次数。
 
 一个跑在公网上的 MCP 服务器，把**确定性算法**（统计检验、生存分析、生信算子、引物设计、文献检索）
-暴露给任何支持 MCP 的智能体（Claude、ChatGPT、Cursor、Cline、Dify、Coze、自研脚本）。
+暴露给任何支持 MCP 的智能体（Claude、ChatGPT、Cursor、Cline、Dify、Coze、魔搭、自研脚本）。
 
 ---
 
@@ -28,11 +35,23 @@ https://sanyu.wentangkeji.com/api/mcp
 - **看目录不需要密钥**（`tools/list` 公开），**执行才需要**
 - 密钥获取：注册后在 https://sanyu.wentangkeji.com 的「API 密钥」页生成（注册送试用积分）
 
-### Claude Code
+### ModelScope（魔搭）/ 通用 MCP 配置
 
-```bash
-claude mcp add --transport http sanyu https://sanyu.wentangkeji.com/api/mcp \
-  --header "Authorization: Bearer sk-sanyu-你的密钥"
+> ⚠️ 这一段必须排在其他配置之前：魔搭**只取第一个 `mcpServers` 块**做部署检测，
+> 且 `type` 只认 `streamable_http`（下划线）。写成 `http` 会导致"基础信息解析失败"。
+
+```json
+{
+  "mcpServers": {
+    "sanyu-research": {
+      "type": "streamable_http",
+      "url": "https://sanyu.wentangkeji.com/api/mcp",
+      "headers": {
+        "Authorization": "Bearer sk-sanyu-REPLACE-WITH-YOUR-OWN-KEY"
+      }
+    }
+  }
+}
 ```
 
 ### Cursor / Cline / 任何 `mcp.json`
@@ -47,6 +66,13 @@ claude mcp add --transport http sanyu https://sanyu.wentangkeji.com/api/mcp \
     }
   }
 }
+```
+
+### Claude Code
+
+```bash
+claude mcp add --transport http sanyu https://sanyu.wentangkeji.com/api/mcp \
+  --header "Authorization: Bearer sk-sanyu-你的密钥"
 ```
 
 ### 只支持本地进程的旧客户端
@@ -68,17 +94,21 @@ claude mcp add --transport http sanyu https://sanyu.wentangkeji.com/api/mcp \
 ```
 https://sanyu.wentangkeji.com/api/open/v1/openapi.json
 ```
-认证方式选 Bearer，填 `sk-sanyu-xxx`。
 
-## 工具分类（100+）
+认证方式选 Bearer，填 `sk-sanyu-xxx`。
+若觉得 105 个工具太多、Agent 选不准，可改用精选 24 个的 schema 导入。
+
+## 工具分类（106）
 
 | 类别 | 代表动作 |
 |---|---|
 | 统计分析 | ROC/AUC、DeLong、校准曲线、生存分析（KM/Cox）、ANOVA 及两两比较、置换检验、Egger 检验、IPTW、SMD 均衡 |
 | 数据采集 | Table 1（基线表）、亚组 Table 1、数据快速画像 |
+| 研究设计 | 样本量计算、随机化分组（固定种子可复现）、倾向性评分匹配 PSM |
 | 生信解读 | 差异表达、GO/KEGG 富集、PPI 网络、单细胞分析、代谢组 PCA/PLS-DA/火山图/热图 |
 | 湿实验与序列 | 引物设计、Tm 计算、序列翻译/ORF/酶切位点、qPCR 2^-ΔΔCt、蛋白理化性质 |
 | 建模预测 | 列线图、SHAP、PSI、NCA 药代、PK/PD 模拟 |
+| 图表与规范 | 森林图、CONSORT 流程图、PRISMA 流程图、报告规范清单核对 |
 | 文献 | PubMed 检索、站内全文检索、引文格式化 |
 
 完整清单：`GET /api/open/v1/actions` 或 MCP 的 `tools/list`。
@@ -87,7 +117,7 @@ https://sanyu.wentangkeji.com/api/open/v1/openapi.json
 
 | 类型 | 每次 |
 |---|---|
-| 统计 / 序列 / 病理 | 1 分 |
+| 统计 / 序列 / 病理 / 图表 | 1 分 |
 | 文献检索 | 2 分 |
 | 生信管线 | 5 分 |
 | 免费档 | 每 key 每日 100 分封顶，注册送试用积分 |
