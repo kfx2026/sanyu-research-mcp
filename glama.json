@@ -4,7 +4,7 @@
     "kfx2026"
   ],
   "name": "sanyu-research-mcp",
-  "description": "Real-algorithm medical research engines (106 deterministic tools): ROC/AUC, DeLong, survival KM/Cox, Table 1, DEG, GO/KEGG enrichment, PPI, primer design, literature search. Every response carries engine_status (real/unavailable) and data_source — auditable, not LLM guessing.",
+  "description": "Real-algorithm medical research engines (106 deterministic tools): ROC/AUC with DeLong CI, survival KM/Cox, Table 1, sample size, PSM/IPTW, DEG, GO/KEGG enrichment, PPI network, primer design, literature search. Every response carries engine_status (real/unavailable/error) and data_source — auditable, not LLM guessing. Failed calls are never charged, and 3 tools (sequence translate, ORF, ROC) run key-free for evaluation.",
   "type": "mcp_server",
   "status": "stable",
   "transport": [
@@ -15,11 +15,15 @@
     "model-context-protocol",
     "medical-research",
     "clinical-research",
+    "clinical-trials",
     "bioinformatics",
     "statistics",
     "survival-analysis",
+    "differential-expression",
+    "pathway-enrichment",
     "primer-design",
     "literature-search",
+    "evidence-based-medicine",
     "reproducible-research"
   ]
 }
