@@ -1,12 +1,17 @@
 # SanYu Research Engine — MCP Server
 
-**Real-algorithm medical research engines. 106 deterministic tools. No LLM guessing.**
+**Medical research engines: 106 deterministic tools + 39 AI writers.**
+
+> 106 个是**确定性算法**（SciPy / statsmodels / 自研算子），结果可复现，可以当结论用；
+> 39 个是**大模型生成**（选题 / 方案 / 写作 / 审稿 / 润色），结果**不可复现**。
+> 每个工具在 `_meta.sanyu/api_class` 里标了 `compute` / `data` / `gen` ——
+> 转述给用户时必须说清是哪一类，别把生成草稿说成算出来的结果。
 
 > **调用需要自备密钥**：目录和工具列表免费查看，执行需在
 > [sanyu.wentangkeji.com/api-keys](https://sanyu.wentangkeji.com/api-keys) 免费领取一把 key，
 > 填进 `Authorization: Bearer sk-sanyu-xxx`（注册送试用积分，执行失败不扣分）。
 >
-> **只想先试试效果？** `act_sequence_translate`、`act_sequence_orf`、`act_roc`
+> **只想先试试效果？** `dna_translate`、`orf_find`、`roc_auc`
 > 这三个工具**无需密钥**，每 IP 每天可试 20 次，返回体带 `demo:true` 与剩余次数。
 
 一个跑在公网上的 MCP 服务器，把**确定性算法**（统计检验、生存分析、生信算子、引物设计、文献检索）
@@ -96,9 +101,9 @@ https://sanyu.wentangkeji.com/api/open/v1/openapi.json
 ```
 
 认证方式选 Bearer，填 `sk-sanyu-xxx`。
-若觉得 105 个工具太多、Agent 选不准，可改用精选 24 个的 schema 导入。
+若觉得 145 个工具太多、Agent 选不准，可改用精选 24 个的 schema 导入。
 
-## 工具分类（106）
+## 工具分类（145 = 106 确定性 + 39 生成）
 
 | 类别 | 代表动作 |
 |---|---|
@@ -110,6 +115,7 @@ https://sanyu.wentangkeji.com/api/open/v1/openapi.json
 | 建模预测 | 列线图、SHAP、PSI、NCA 药代、PK/PD 模拟 |
 | 图表与规范 | 森林图、CONSORT 流程图、PRISMA 流程图、报告规范清单核对 |
 | 文献 | PubMed 检索、站内全文检索、引文格式化 |
+| **生成类（不可复现）** | 选题、研究方案、论文初稿、单章写作、润色、六智能体审稿、投稿信、汇报 PPT |
 
 完整清单：`GET /api/open/v1/actions` 或 MCP 的 `tools/list`。
 
@@ -127,10 +133,23 @@ https://sanyu.wentangkeji.com/api/open/v1/openapi.json
 
 ## 写权限边界
 
-开放的只有**计算类**动作。写平台、写别人数据、动语料库——**目录里根本没有这些工具**：
+默认**只算不落**：传 `project_id` / `user_id` 会被**主动剥离**，并在 `warnings` 里说明。
+受试者数据类动作（CRF 建表、数据导入、脱敏、建模训练）**不在白名单**——目录里没有这些工具。
 
-- 传 `project_id` / `user_id` 会被**主动剥离**，并在 `warnings` 里说明
-- 写作、CRF 建表、保存结果、删项目等动作**不在白名单**
+**唯一例外**：`paper_draft_one_click` 会在后台建一个写作任务并落库，它的
+`annotations.readOnlyHint = false`。调用前请先跟用户确认；表里其它生成类都不写库。
+
+## 生成类怎么取结果（异步）
+
+39 个生成类动作是**异步**的：返回 `success: true` + `job_id` + `engine_status: queued`，
+**这不是结果，是已受理**。要用 `sanyu_job_status` 轮询：
+
+```json
+{ "name": "sanyu_job_status", "arguments": { "job_id": "job_xxxxxxxx" } }
+```
+
+每 3 秒一次，最多等 300 秒。`status=succeeded` 取 `result`；`failed` 读 `error`（失败不扣分）。
+**拿到 succeeded 之前不要向用户报告任何结果。**
 
 ## 响应示例
 
