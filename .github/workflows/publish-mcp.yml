@@ -15,9 +15,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
+      # 2026-11-08 修：原来用 releases/latest/download/<name> 直连，实测下回来只有 92 字节
+      # （gzip: stdin: not in gzip format / tar 报错），run 42469128974 因此失败。
+      # 改为先用 API 取"这个 tag 下真实存在的资产 URL"，再下；并打印大小/类型，失败一眼能看出。
       - name: Install mcp-publisher
         run: |
-          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+          set -euo pipefail
+          OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+          ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+          NAME="mcp-publisher_${OS}_${ARCH}.tar.gz"
+          echo "looking for asset: ${NAME}"
+          URL=$(curl -fsSL -H "Accept: application/vnd.github+json" \
+                https://api.github.com/repos/modelcontextprotocol/registry/releases/latest \
+                | grep -o "https://[^\"]*${NAME}" | head -1)
+          if [ -z "${URL}" ]; then
+            echo "::error::asset ${NAME} not found in the latest release"
+            exit 1
+          fi
+          echo "asset url: ${URL}"
+          curl -fsSL -o /tmp/mcp-publisher.tar.gz "${URL}"
+          echo "downloaded bytes: $(wc -c < /tmp/mcp-publisher.tar.gz)"
+          tar tzf /tmp/mcp-publisher.tar.gz | head -5
+          tar xzf /tmp/mcp-publisher.tar.gz mcp-publisher
+          chmod +x mcp-publisher
+          ./mcp-publisher --help > /dev/null && echo "mcp-publisher is runnable"
 
       - name: Authenticate to MCP Registry (GitHub OIDC)
         run: ./mcp-publisher login github-oidc
