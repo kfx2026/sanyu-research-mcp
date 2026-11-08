@@ -15,34 +15,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      # 2026-11-08 修：原来用 releases/latest/download/<name> 直连，实测下回来只有 92 字节
-      # （gzip: stdin: not in gzip format / tar 报错），run 42469128974 因此失败。
-      # 改为先用 API 取"这个 tag 下真实存在的资产 URL"，再下；并打印大小/类型，失败一眼能看出。
-      - name: Install mcp-publisher
-        run: |
-          set -euo pipefail
-          OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-          ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
-          NAME="mcp-publisher_${OS}_${ARCH}.tar.gz"
-          echo "looking for asset: ${NAME}"
-          URL=$(curl -fsSL -H "Accept: application/vnd.github+json" \
-                https://api.github.com/repos/modelcontextprotocol/registry/releases/latest \
-                | grep -o "https://[^\"]*${NAME}" | head -1)
-          if [ -z "${URL}" ]; then
-            echo "::error::asset ${NAME} not found in the latest release"
-            exit 1
-          fi
-          echo "asset url: ${URL}"
-          # GitHub Releases 的对象存储偶发 504（run 42469250965 实测），必须重试
-          curl -fsSL --retry 6 --retry-delay 5 --retry-all-errors -o /tmp/mcp-publisher.tar.gz "${URL}"
-          echo "downloaded bytes: $(wc -c < /tmp/mcp-publisher.tar.gz)"
-          tar tzf /tmp/mcp-publisher.tar.gz | head -5
-          tar xzf /tmp/mcp-publisher.tar.gz mcp-publisher
-          chmod +x mcp-publisher
-          ./mcp-publisher --help > /dev/null && echo "mcp-publisher is runnable"
+      - name: Show what is being published
+        run: cat server.json
 
-      - name: Authenticate to MCP Registry (GitHub OIDC)
-        run: ./mcp-publisher login github-oidc
-
-      - name: Publish server to MCP Registry
-        run: ./mcp-publisher publish
+      # 2026-11-08：**不再下载 mcp-publisher 二进制**。
+      #   `mcp-publisher_linux_amd64.tar.gz` 在 objects.githubusercontent.com 上
+      #   连续 7 次 504（runs 42469128974 / 42469250965 / 42469309767），
+      #   releases/latest/download 直连还回过 92 字节的错误页（tar 报 not in gzip format）。
+      #   Registry 本身就是 HTTP API，CLI 只是它的壳 ⇒ 直接调 API，少一个外部二进制依赖。
+      - name: Publish to MCP Registry (official HTTP API)
+        run: python3 .github/scripts/publish_registry.py
