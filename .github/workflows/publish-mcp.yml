@@ -33,7 +33,8 @@ jobs:
             exit 1
           fi
           echo "asset url: ${URL}"
-          curl -fsSL -o /tmp/mcp-publisher.tar.gz "${URL}"
+          # GitHub Releases 的对象存储偶发 504（run 42469250965 实测），必须重试
+          curl -fsSL --retry 6 --retry-delay 5 --retry-all-errors -o /tmp/mcp-publisher.tar.gz "${URL}"
           echo "downloaded bytes: $(wc -c < /tmp/mcp-publisher.tar.gz)"
           tar tzf /tmp/mcp-publisher.tar.gz | head -5
           tar xzf /tmp/mcp-publisher.tar.gz mcp-publisher
