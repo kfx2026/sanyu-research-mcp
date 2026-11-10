@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.kfx2026/sanyu-research",
   "title": "三域医研 · 科研算法引擎 (SanYu Research Engine)",
-  "description": "145 actions (106 deterministic + 39 AI) = 147 MCP tools; L2 on; default 108; auditable.",
-  "version": "1.2.2",
+  "description": "147 tools: deterministic compute + 39 AI writers; each response self-labels data_source + verified.",
+  "version": "1.3.0",
   "websiteUrl": "https://sanyu.wentangkeji.com",
   "repository": {
     "url": "https://github.com/kfx2026/sanyu-research-mcp",
