@@ -8,6 +8,10 @@
 
 **Medical research engines: 106 deterministic actions + 39 AI writers (L2 profile).**
 
+> **生成类工具的密钥前提（务必先读）**：39 个生成类动作（`api_class=gen`，结果不可复现、`readOnlyHint=false`）需要 **`generate` scope** 的密钥。
+> 平台当前**只发放 `compute` scope 密钥、尚未发放 `generate` scope 密钥**，因此用现有密钥调用生成类会被 `scope_not_allowed`（HTTP 403）明确拒绝，`engine_status=not_run`、`cost=0`——不执行、不扣分、不产生 LLM 费用。
+> 也就是说：目录里列得出这 39 个工具，但**当前拿不到生成结果**。需要开通生成能力请联系平台另行签发对应类别的密钥；这不是工具故障。（实测：`compute`→403 `scope_not_allowed`；`generate`→通过门禁、按各工具 `inputSchema` 补齐参数后异步返回 `job_id`。）
+
 > 106 个是**确定性算法**（SciPy / statsmodels / 自研算子），结果可复现，可以当结论用；
 > 39 个是**大模型生成**（选题 / 方案 / 写作 / 审稿 / 润色），结果**不可复现**。
 > 每个工具在 `_meta.sanyu/api_class` 里标了 `compute` / `data` / `gen` ——
