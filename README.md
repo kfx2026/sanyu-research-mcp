@@ -1,4 +1,6 @@
-# SanYu Research Engine — MCP Server
+# 三域医研 · 科研算法引擎 (SanYu Research Engine) — MCP Server
+
+> 正式中文名：**三域医研 · 科研算法引擎**；英文检索名 SanYu Research Engine。平台站：https://sanyu.wentangkeji.com
 
 **Medical research engines: 106 deterministic tools + 39 AI writers.**
 
