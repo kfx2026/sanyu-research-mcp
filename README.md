@@ -10,10 +10,13 @@
 
 > **生成类工具的密钥前提（务必先读）**：39 个生成类动作（`api_class=gen`，结果不可复现、`readOnlyHint=false`）需要 **`generate` scope** 的密钥。
 > 平台当前**只发放 `compute` scope 密钥、尚未发放 `generate` scope 密钥**，因此用现有密钥调用生成类会被 `scope_not_allowed`（HTTP 403）明确拒绝，`engine_status=not_run`、`cost=0`——不执行、不扣分、不产生 LLM 费用。
-> 也就是说：目录里列得出这 39 个工具，但**当前拿不到生成结果**。需要开通生成能力请联系平台另行签发对应类别的密钥；这不是工具故障。（实测：`compute`→403 `scope_not_allowed`；`generate`→通过门禁、按各工具 `inputSchema` 补齐参数后异步返回 `job_id`。）
+> 也就是说：目录里列得出这 39 个工具，但**当前拿不到生成结果**。需要开通生成能力请联系平台另行签发对应类别的密钥；这不是工具故障。
+>
+> **引擎口径（2026-11-10 复核）**：这 39 个动作按 `api_class=gen` 归类、需要 `generate` scope，但**并非每一个都调用大模型**——逐个核对执行体后确认，其中一部分是纯本地规则/文献计量引擎（选题可行性、新颖度、研究空白、选题热度评估），零 LLM token。响应体的 `data_source` 由服务端**单一出口按实际执行体回填**：确证的本地规则动作返回 `local_computation`（`data_source_verified=true`），其余按分类兜底并标 `data_source_verified=false`（来源未核验，请勿当作事实转述）；排队阶段一律返回 `data_source=pending`，不在执行前预先宣称来自大模型。
+> 分类 / scope / 计费口径保持不变，避免把确证真 LLM 的动作误标成确定性算法。（实测：`compute`→403 `scope_not_allowed`；`generate`→通过门禁、按各工具 `inputSchema` 补齐参数后异步返回 `job_id`。）
 
 > 106 个是**确定性算法**（SciPy / statsmodels / 自研算子），结果可复现，可以当结论用；
-> 39 个是**大模型生成**（选题 / 方案 / 写作 / 审稿 / 润色），结果**不可复现**。
+> 39 个归为**生成类**（选题 / 方案 / 写作 / 审稿 / 润色）；其中多数调用大模型、结果**不可复现**，但**含少量纯本地规则引擎**（见上「引擎口径」），以响应体 `data_source` / `data_source_verified` 为准，勿一概而论。
 > 每个工具在 `_meta.sanyu/api_class` 里标了 `compute` / `data` / `gen` ——
 > 转述给用户时必须说清是哪一类，别把生成草稿说成算出来的结果。
 
