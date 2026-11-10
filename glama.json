@@ -4,7 +4,7 @@
     "kfx2026"
   ],
   "name": "sanyu-research-mcp",
-  "description": "Medical research engines (106 deterministic tools + 39 AI writers): ROC/AUC with DeLong CI, survival KM/Cox, Table 1, sample size, PSM/IPTW, DEG, GO/KEGG enrichment, PPI network, primer design, literature search. Every response carries engine_status (real/unavailable/error) and data_source — auditable, not LLM guessing. Failed calls are never charged, and 3 tools (sequence translate, ORF, ROC) run key-free for evaluation.",
+  "description": "Medical research engines (106 deterministic tools + 39 AI writers): ROC/AUC with DeLong CI, survival KM/Cox, Table 1, sample size, PSM/IPTW, DEG, GO/KEGG enrichment, PPI network, primer design, literature search. Every response carries engine_status (real/unavailable/error) and data_source — auditable, not LLM guessing. Failed calls are never charged, and 3 tools (sequence translate, ORF, ROC) run key-free for evaluation. Official Chinese name: 三域医研 · 科研算法引擎 (SanYu Research Engine).",
   "type": "mcp_server",
   "status": "stable",
   "transport": [
