@@ -2,7 +2,11 @@
 
 > 正式中文名：**三域医研 · 科研算法引擎**；英文检索名 SanYu Research Engine。平台站：https://sanyu.wentangkeji.com
 
-**Medical research engines: 106 deterministic tools + 39 AI writers.**
+**145 个动作 = 106 个确定性算法 + 39 个大模型生成类；对外暴露为 147 个 MCP 工具**
+（145 个动作 + 2 个元工具 `sanyu_list_actions` / `sanyu_job_status`）。
+**档位**：当前生产为 L2 档（`SANYU_OPEN_L2=1`），即上表的 145/147；关闭该开关则为默认档 —— 106 个确定性动作 / 108 个 MCP 工具 / 0 个生成类，全部 `readOnlyHint=true`、不写库。
+
+**Medical research engines: 106 deterministic actions + 39 AI writers (L2 profile).**
 
 > 106 个是**确定性算法**（SciPy / statsmodels / 自研算子），结果可复现，可以当结论用；
 > 39 个是**大模型生成**（选题 / 方案 / 写作 / 审稿 / 润色），结果**不可复现**。
@@ -105,7 +109,7 @@ https://sanyu.wentangkeji.com/api/open/v1/openapi.json
 认证方式选 Bearer，填 `sk-sanyu-xxx`。
 若觉得 145 个工具太多、Agent 选不准，可改用精选 24 个的 schema 导入。
 
-## 工具分类（145 = 106 确定性 + 39 生成）
+## 动作分类（145 = 106 确定性 + 39 生成）｜MCP 工具 147 = 145 + 2 元工具
 
 | 类别 | 代表动作 |
 |---|---|
