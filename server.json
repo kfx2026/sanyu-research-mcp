@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.kfx2026/sanyu-research",
   "title": "三域医研 · 科研算法引擎 (SanYu Research Engine)",
-  "description": "145 tools: 106 deterministic engines (stats, survival, bioinfo, primers) + 39 AI writers.",
-  "version": "1.2.1",
+  "description": "145 actions = 106 deterministic engines (stats, survival, bioinfo, primers) + 39 AI writers; exposed as 147 MCP tools (145 actions + 2 meta tools). L2 profile; default profile is 106 actions / 108 tools. Every response carries engine_status and data_source; one writing action (paper_draft_one_click) is marked readOnlyHint=false.",
+  "version": "1.2.2",
   "websiteUrl": "https://sanyu.wentangkeji.com",
   "repository": {
     "url": "https://github.com/kfx2026/sanyu-research-mcp",
