@@ -3,7 +3,7 @@
   "name": "io.github.kfx2026/sanyu-research",
   "title": "三域医研 · 科研算法引擎 (SanYu Research Engine)",
   "description": "145 tools: 106 deterministic engines (stats, survival, bioinfo, primers) + 39 AI writers.",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "websiteUrl": "https://sanyu.wentangkeji.com",
   "repository": {
     "url": "https://github.com/kfx2026/sanyu-research-mcp",
