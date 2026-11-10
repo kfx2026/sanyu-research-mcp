@@ -9,7 +9,7 @@
 **Medical research engines: 106 deterministic actions + 39 AI writers (L2 profile).**
 
 > **生成类工具的密钥前提（务必先读）**：39 个生成类动作（`api_class=gen`，结果不可复现、`readOnlyHint=false`）需要 **`generate` scope** 的密钥。
-> 平台当前**只发放 `compute` scope 密钥、尚未发放 `generate` scope 密钥**，因此用现有密钥调用生成类会被 `scope_not_allowed`（HTTP 403）明确拒绝，`engine_status=not_run`、`cost=0`——不执行、不扣分、不产生 LLM 费用。
+> `generate` scope 密钥**可自助签发**：在「API 密钥」页创建时选「AI 生成」类别即可（`GET /api/keys/scopes` 里 `creatable: true`，不需要管理员）。只用 `compute` 密钥调生成类会被 `scope_not_allowed`（HTTP 403）明确拒绝，`engine_status=not_run`、`cost=0`——不执行、不扣分、不产生 LLM 费用。
 > 也就是说：目录里列得出这 39 个工具，但**当前拿不到生成结果**。需要开通生成能力请联系平台另行签发对应类别的密钥；这不是工具故障。
 >
 > **引擎口径（2026-11-10 复核）**：这 39 个动作按 `api_class=gen` 归类、需要 `generate` scope，但**并非每一个都调用大模型**——逐个核对执行体后确认，其中一部分是纯本地规则/文献计量引擎（选题可行性、新颖度、研究空白、选题热度评估），零 LLM token。响应体的 `data_source` 由服务端**单一出口按实际执行体回填**：确证的本地规则动作返回 `local_computation`（`data_source_verified=true`），其余按分类兜底并标 `data_source_verified=false`（来源未核验，请勿当作事实转述）；排队阶段一律返回 `data_source=pending`，不在执行前预先宣称来自大模型。
@@ -31,6 +31,29 @@
 暴露给任何支持 MCP 的智能体（Claude、ChatGPT、Cursor、Cline、Dify、Coze、魔搭、自研脚本）。
 
 ---
+
+## 自审计标签（每个响应都带）
+
+这两个字段回答同一个问题：**这次结果是算出来的，还是生成的？**
+
+| `data_source` | 含义 | 能不能当结论 |
+|---|---|---|
+| `local_computation` | 确定性算法算出，同输入同输出 | 可以（给复现参数） |
+| `external_corpus` | 读取真实语料（如 PMC 全文库）后计算 | 可以，注明语料版本 |
+| `llm_generated` | 大模型生成（选题 / 方案 / 写作 / 审稿 / 润色） | **不可复现，只能当草稿** |
+| `user_data` | 基于调用方上传的数据计算 | 可以，注明自有数据口径 |
+| `pending` | 已受理、**尚未执行** | 什么都还没发生，不得预先宣称来源 |
+
+| `data_source_verified` | 含义 |
+|---|---|
+| `true` | 标签由执行体亲自上报，或经三重证据确证 |
+| `false` | 标签按动作分类推断，**未经执行体确认** |
+
+> ⚠️ **`verified=false` 不等于结果无效。** 它只说明"来源标签是按分类推断的"，
+> 数值本身照常可用；需要避免的是把**来源**当事实向用户断言，而不是把结果丢掉。
+
+生成类为异步：提交后返回 `data_source=pending` + `verified=false`，
+轮询到 `status=succeeded` 才拿 `result` 与最终标签。
 
 ## 它和"大模型套壳"的区别
 
